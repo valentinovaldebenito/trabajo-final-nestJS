@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//Creación de los Modelos:
+model Usuario {
+  //El id del usuario
+  id Int @id @default(autoincrement())
+  correo String @unique // @[nombreDecorador] son los decoradores que utiliza prisma
+  contrasenia String? // "?" Significa que el atributo puede ser nulo
+  posteos Post[] // Toma la referencia de los objetos relacionados al usuario
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  titulo String?
+  cuerpo String?
+  autor Usuario? @relation(fields: [autorId], references: [id])  // Toma la referencia del objeto de usuario
+  autorId Int? // Sólo se encarga de linkear el id del usuario
+}
+
+
