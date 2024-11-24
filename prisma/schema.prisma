@@ -19,15 +19,38 @@ model Usuario {
   id Int @id @default(autoincrement())
   correo String @unique // @[nombreDecorador] son los decoradores que utiliza prisma
   contrasenia String? // "?" Significa que el atributo puede ser nulo
-  posteos Post[] // Toma la referencia de los objetos relacionados al usuario
+  productosCargados Producto[] // Toma la referencia de los objetos relacionados al usuario
+  ediciones Ediciones[] @relation("ediciones_entidad") // Las ediciones realizadas a la entidad
+  edicionesUsuario Ediciones[] @relation("usuario_edita") // Las ediciones que realizó el usuario
+
+  disponible Boolean? @default(true)
+
+  //Queries mas rapidas por el index
+  //Filtra los resultado de antemano
+  //Organiza internamente el almacenamiento de los datos en funcion de este campo
+  @@index([disponible])
 }
 
-model Post {
+model Producto {
   id Int @id @default(autoincrement())
-  titulo String?
-  cuerpo String?
-  autor Usuario? @relation(fields: [autorId], references: [id])  // Toma la referencia del objeto de usuario
-  autorId Int? // Sólo se encarga de linkear el id del usuario
+  marca String?
+  descripcion String?
+  usuarioCarga Usuario? @relation(fields: [usaurioCargaId], references: [id])  // Toma la referencia del objeto de usuario
+  usaurioCargaId Int? // Sólo se encarga de linkear el id del usuario
+}
+
+model Ediciones {
+  id Int @id @default(autoincrement())
+  descripcion  String?
+  fecha DateTime? @default(now())
+  // Hace referencia a las ediciones que
+  // se realizaron a la entidad
+  usuario Usuario? @relation("ediciones_entidad", fields: [usuarioId], references: [id])
+  usuarioId Int?
+  // Hace referencia a que usuario realizó
+  // la edición
+  usuarioEditor Usuario? @relation("usuario_edita", fields: [usuarioEditorId], references: [id])
+  usuarioEditorId Int?
 }
 
 

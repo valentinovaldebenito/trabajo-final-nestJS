@@ -1,34 +1,75 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { UsuariosService } from './usuarios.service';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseIntPipe,
+  Res,
+  HttpStatus,
+} from "@nestjs/common";
+import { UsuariosService } from "./usuarios.service";
+import { CreateUsuarioDto } from "./dto/create-usuario.dto";
+import { UpdateUsuarioDto } from "./dto/update-usuario.dto";
+import { LoginDto } from "./dto/login.dto";
+import { PaginatorDto } from "./dto/paginator.dto";
+import { Public } from "src/common/decorators/public.decorator";
+import { Usuario } from "src/common/decorators/usuario.decorator";
+import { UpdateEdicioneDto } from "src/ediciones/dto/update-edicione.dto";
+import { Response } from "express";
 
-@Controller('usuarios')
+@Controller("usuarios")
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuariosService.create(createUsuarioDto);
+  @Post("auth/register")
+  @Public() //Hacemos publica esta ruta
+  register(@Body() createUsuarioDto: CreateUsuarioDto) {
+    return this.usuariosService.register(createUsuarioDto);
+  }
+
+  @Post("auth/login")
+  @Public() //Hacemos publica esta ruta
+  login(@Body() credenciales: LoginDto) {
+    return this.usuariosService.login(credenciales);
   }
 
   @Get()
-  findAll() {
-    return this.usuariosService.findAll();
+  async findAll(@Query() paginator: PaginatorDto) {
+    return this.usuariosService.findAll(paginator);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  async findOne(@Param("id", ParseIntPipe) id: number) {
     return this.usuariosService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+    @Patch(":id")
+  async update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateEdicioneDto: UpdateEdicioneDto,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+    @Usuario() usuario: UpdateUsuarioDto,
+    @Res() response: Response,
+  ) {
+    const result = await this.usuariosService.update(
+      id,
+      updateUsuarioDto,
+      usuario,
+    );
+    response.status(HttpStatus.OK).json({ ok: true, result, msg: "Approved" });
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usuariosService.remove(+id);
+  @Delete(":id")
+  async remove(
+    @Param("id", ParseIntPipe) id: number,
+    @Usuario() usuario: UpdateUsuarioDto,
+    @Res() response: Response,
+  ) {
+    const result = await this.usuariosService.remove(id, usuario);
+    response.status(HttpStatus.OK).json({ ok: true, result, msg: "Approved" });
   }
 }
