@@ -72,6 +72,27 @@ export class UsuariosService {
   }
   //!Servicios de autenticación ---------------------------------------->
 
+  async create(createUsuarioDto: CreateUsuarioDto) {
+    //Deconstruimos el objeto
+    const { contrasenia, correo, rol } = createUsuarioDto || {};
+    //Buscamos en los registros si ya hay un usuario con ese correo
+    const usuario = await this.prisma.usuario.findFirst({ where: { correo } });
+    //Si existe, lanzamos el error
+    if (usuario) throw new BadRequestException("El correo ingresado ya existe");
+    //En caso que no se encuentre la contraseña (no debería pasar si se configuro bien el DTO)
+    if (!contrasenia) throw new BadRequestException("Ingrese todos los campos");
+    //Hasheamos la contraseña
+    const hashPassword = await this.auth.hashContrasenia(contrasenia);
+    //Creamos el usuario
+    const newUsuario = await this.prisma.usuario.create({
+      data: { ...createUsuarioDto, contrasenia: hashPassword },
+    });
+    //Borramos la propiedad de la contraseña
+    delete newUsuario["contrasenia"];
+    //Retornamos el usuario creado
+    return newUsuario;
+  }
+
   async findAll(paginator: PaginatorDto) {
     //Desestructuramos el objeto
     const { page, perPage } = paginator || {};

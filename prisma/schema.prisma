@@ -25,10 +25,18 @@ model Usuario {
 
   disponible Boolean? @default(true)
 
+  rol Rol?
+
   //Queries mas rapidas por el index
   //Filtra los resultado de antemano
   //Organiza internamente el almacenamiento de los datos en funcion de este campo
   @@index([disponible])
+}
+
+enum Rol {
+  SUPERADMIN
+  ADMIN
+  COMUN
 }
 
 model Producto {
@@ -39,8 +47,14 @@ model Producto {
   usuarioCargaId Int? // Sólo se encarga de linkear el id del usuario
   precioUnitario Decimal?
   cantStock Int?
+
+  ediciones Ediciones[] @relation("producto_editado")
+
   activo Boolean?
+
+  @@index([activo])
 }
+
 
 model Ediciones {
   id Int @id @default(autoincrement())
@@ -54,6 +68,9 @@ model Ediciones {
   // la edición
   usuarioEditor Usuario? @relation("usuario_edita", fields: [usuarioEditorId], references: [id])
   usuarioEditorId Int?
+
+  producto Producto? @relation("producto_editado", fields: [productoId], references: [id])
+  productoId Int?
 }
 
 

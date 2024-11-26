@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Res,
   HttpStatus,
+  UseGuards,
 } from "@nestjs/common";
 import { UsuariosService } from "./usuarios.service";
 import { CreateUsuarioDto } from "./dto/create-usuario.dto";
@@ -20,7 +21,12 @@ import { Public } from "src/common/decorators/public.decorator";
 import { Usuario } from "src/common/decorators/usuario.decorator";
 import { UpdateEdicionesDto } from "src/ediciones/dto/update-edicione.dto";
 import { Response } from "express";
+import { JwtGuard } from "./auth/jwt.guard";
+import { RolGuard } from "./auth/rol.guard";
+import { Roles } from "src/common/decorators/rol.decorator";
+import { Rol } from "@prisma/client";
 
+@UseGuards(JwtGuard, RolGuard)
 @Controller("usuarios")
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
@@ -29,6 +35,15 @@ export class UsuariosController {
   @Public() //Hacemos publica esta ruta
   register(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.register(createUsuarioDto);
+  }
+  
+  @Post()
+  @Roles(Rol.SUPERADMIN)
+  async create(
+    @Body() createUsuarioDto: CreateUsuarioDto,
+    @Res() response: Response
+  ){
+    return this.usuariosService.create(createUsuarioDto)
   }
 
   @Post("auth/login")

@@ -1,34 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ProductosService } from './productos.service';
-import { CreateProductoDto } from './dto/create-producto.dto';
-import { UpdateProductoDto } from './dto/update-producto.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseIntPipe,
+  Res,
+  HttpStatus,
+} from "@nestjs/common";
+import { ProductosService } from "./productos.service";
+import { CreateProductoDto } from "./dto/create-producto.dto";
+import { UpdateProductoDto } from "./dto/update-producto.dto";
+import { PaginatorDto } from "src/usuarios/dto/paginator.dto";
+import { Usuario } from "src/common/decorators/usuario.decorator";
+import { UpdateEdicionesDto } from "src/ediciones/dto/update-edicione.dto";
+import { UpdateUsuarioDto } from "src/usuarios/dto/update-usuario.dto";
+import { Response } from "express";
 
-@Controller('productos')
+@Controller("productos")
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
-  @Post('create/product')
+  @Post("create/product")
   create(@Body() createProductoDto: CreateProductoDto) {
     return this.productosService.create(createProductoDto);
   }
 
   @Get()
-  findAll() {
-    return this.productosService.findAll();
+  findAll(@Query() paginator: PaginatorDto) {
+    return this.productosService.findAll(paginator);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.productosService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
-    return this.productosService.update(+id, updateProductoDto);
+  @Patch(":id")
+  async update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateEdicioneDto: UpdateEdicionesDto,
+    @Body() updateProductoDto: UpdateProductoDto,
+    @Usuario() usuario: UpdateUsuarioDto,
+    @Res() response: Response,
+  ) {
+    const result = await this.productosService.update(
+      id,
+      updateProductoDto,
+      usuario,
+    );
+
+    response.status(HttpStatus.OK).json({ok: true, result, msg: 'Producto editado correctamente'})
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productosService.remove(+id);
+  @Delete(":id")
+  async remove(
+    @Param("id", ParseIntPipe) id: number,
+    @Usuario() usuario: UpdateUsuarioDto,
+    @Res() response: Response,
+  ) {
+    const result = await this.productosService.remove(id, usuario);
+    response.status(HttpStatus.OK).json({ ok: true, result, msg: "Producto desactivado correctamente" });
   }
 }
