@@ -35,8 +35,11 @@ model Producto {
   id Int @id @default(autoincrement())
   marca String?
   descripcion String?
-  usuarioCarga Usuario? @relation(fields: [usaurioCargaId], references: [id])  // Toma la referencia del objeto de usuario
-  usaurioCargaId Int? // Sólo se encarga de linkear el id del usuario
+  usuarioCarga Usuario? @relation(fields: [usuarioCargaId], references: [id])  // Toma la referencia del objeto de usuario
+  usuarioCargaId Int? // Sólo se encarga de linkear el id del usuario
+  precioUnitario Decimal?
+  cantStock Int?
+  activo Boolean?
 }
 
 model Ediciones {

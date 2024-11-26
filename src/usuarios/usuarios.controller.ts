@@ -18,7 +18,7 @@ import { LoginDto } from "./dto/login.dto";
 import { PaginatorDto } from "./dto/paginator.dto";
 import { Public } from "src/common/decorators/public.decorator";
 import { Usuario } from "src/common/decorators/usuario.decorator";
-import { UpdateEdicioneDto } from "src/ediciones/dto/update-edicione.dto";
+import { UpdateEdicionesDto } from "src/ediciones/dto/update-edicione.dto";
 import { Response } from "express";
 
 @Controller("usuarios")
@@ -47,10 +47,10 @@ export class UsuariosController {
     return this.usuariosService.findOne(+id);
   }
 
-    @Patch(":id")
+  @Patch(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateEdicioneDto: UpdateEdicioneDto,
+    @Body() updateEdicioneDto: UpdateEdicionesDto,
     @Body() updateUsuarioDto: UpdateUsuarioDto,
     @Usuario() usuario: UpdateUsuarioDto,
     @Res() response: Response,

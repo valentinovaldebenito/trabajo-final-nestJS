@@ -6,9 +6,10 @@ import { UsuariosModule } from "./usuarios/usuarios.module";
 import { GUARD_KEY } from "./common/keys/guard.key";
 import { JwtGuard } from "./usuarios/auth/jwt.guard";
 import { EdicionesModule } from './ediciones/ediciones.module';
+import { ProductosModule } from './productos/productos.module';
 
 @Module({
-  imports: [PrismaModule, UsuariosModule, EdicionesModule],
+  imports: [PrismaModule, UsuariosModule, EdicionesModule, ProductosModule],
   controllers: [AppController],
   providers: [
     AppService,
