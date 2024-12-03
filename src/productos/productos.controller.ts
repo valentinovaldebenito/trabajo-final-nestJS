@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Res,
   HttpStatus,
+  UseGuards,
 } from "@nestjs/common";
 import { ProductosService } from "./productos.service";
 import { CreateProductoDto } from "./dto/create-producto.dto";
@@ -19,7 +20,12 @@ import { Usuario } from "src/common/decorators/usuario.decorator";
 import { UpdateEdicionesDto } from "src/ediciones/dto/update-edicione.dto";
 import { UpdateUsuarioDto } from "src/usuarios/dto/update-usuario.dto";
 import { Response } from "express";
+import { JwtGuard } from "src/usuarios/auth/jwt.guard";
+import { RolGuard } from "src/usuarios/auth/rol.guard";
+import { Rol } from "@prisma/client";
+import { Roles } from "src/common/decorators/rol.decorator";
 
+@UseGuards(JwtGuard, RolGuard)
 @Controller("productos")
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
@@ -40,6 +46,7 @@ export class ProductosController {
   }
 
   @Patch(":id")
+  @Roles(Rol.SUPERADMIN, Rol.ADMIN)
   async update(
     @Param("id", ParseIntPipe) id: number,
     @Body() updateEdicioneDto: UpdateEdicionesDto,
@@ -57,6 +64,7 @@ export class ProductosController {
   }
 
   @Delete(":id")
+  @Roles(Rol.SUPERADMIN, Rol.ADMIN)
   async remove(
     @Param("id", ParseIntPipe) id: number,
     @Usuario() usuario: UpdateUsuarioDto,

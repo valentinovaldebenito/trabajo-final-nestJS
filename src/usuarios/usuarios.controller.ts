@@ -43,7 +43,8 @@ export class UsuariosController {
     @Body() createUsuarioDto: CreateUsuarioDto,
     @Res() response: Response
   ){
-    return this.usuariosService.create(createUsuarioDto)
+    const result = await this.usuariosService.create(createUsuarioDto)
+    response.status(HttpStatus.OK).json({ok: true, result, msg: 'Usuario creado exitosamente' })
   }
 
   @Post("auth/login")

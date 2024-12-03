@@ -11,11 +11,12 @@ export class AuthService {
 
   crearJwt(usuario: UpdateUsuarioDto): string {
     //Desestructuramos el objeto
-    const { id: sub, correo } = usuario || {};
+    const { id: sub, correo, rol } = usuario || {};
     //Creamos el payload
     const payload: PayloadInterface = {
       sub, //Pasamos las variables
       correo,
+      rol
     };
 
     return this.jwtService.sign(payload);

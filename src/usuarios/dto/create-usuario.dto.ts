@@ -1,3 +1,4 @@
+import { Rol } from "@prisma/client";
 import { IsEmail, IsIn, IsString } from "class-validator";
 
 export class CreateUsuarioDto {
@@ -11,5 +12,5 @@ export class CreateUsuarioDto {
   @IsIn(["COMUN", "ADMIN"], {
     message: "Los roles permitidos son COMUN o ADMIN",
   })
-  rol?: string;
+  rol?: Rol;
 }
